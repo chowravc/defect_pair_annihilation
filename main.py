@@ -2,7 +2,7 @@
 import numpy as np
 import glob
 import matplotlib.pyplot as plt
-import cv2
+# import cv2
 import random
 import shutil
 import os
@@ -27,8 +27,14 @@ showBoard = False
 ### "Film" dimensions
 # (1200, 870) um
 
+### Start time
+t0 = 0
+
+### End time
+tn = 2e-2
+
 ### Number of iterations
-n = 200000
+n = 100000
 
 ### Save image every __ iterations
 saveRate = 25
@@ -65,7 +71,7 @@ ra = 1e-6
 T = 300
 
 ### Timestep
-dt = 1e-5
+dt = (tn - t0)/n
 
 ### Max dist for annihilation
 annihilationDist = 2e-6
@@ -93,9 +99,6 @@ class Defect():
 		## Add attribute: position (np.array([]): [3])
 		self.position = position
 
-		## Add attribute: velocity (np.array([]): [3])
-		self.velocity = np.array([0.0, 0.0])
-
 		## Add attribute: orientation (float)
 		self.orientation = orientation
 
@@ -110,7 +113,7 @@ class Defect():
 
 
 	### Sqrt velocity
-	def sqrtVelocity(self):
+	def sqrtVelocity(self, x, y):
 
 		## Temporary velocity vector
 		velocity = np.array([0.0, 0.0])
@@ -122,20 +125,20 @@ class Defect():
 			if d != self:
 
 				# Find displacement vector from other defect to this defect
-				dispVector = d.position - self.position
+				dispVector = d.position - np.array([x, y])
 
-				# Find distance between the two defects
-				dist = np.linalg.norm(dispVector)
+				# Find squared distance between the two defects
+				distSq = np.sum(dispVector**2)
 
 				# Compute velocity component due to that defect and add to temporary velocity
-				velocity = velocity - (K_2D/eta_2D)*(self.strength)*(d.strength)*dispVector/(dist**2)
+				velocity = velocity - (K_2D/eta_2D)*(self.strength)*(d.strength)*dispVector/(distSq)
 
 		## Return computed Sqrt velocity
 		return velocity
 
 
 	### Yurke velocity
-	def yurkeVelocity(self):
+	def yurkeVelocity(self, x, y):
 
 		## Temporary velocity vector
 		velocity = np.array([0.0, 0.0])
@@ -147,7 +150,7 @@ class Defect():
 			if d != self:
 
 				# Find displacement vector from other defect to this defect
-				dispVector = d.position - self.position
+				dispVector = d.position - np.array([x, y])
 
 				# Find distance between the two defects
 				dist = np.linalg.norm(dispVector)
@@ -159,15 +162,31 @@ class Defect():
 		return velocity
 
 
-	### Update the velocity of this defect
-	def updateVelocity(self):
+	### Return a velocity step
+	def velocityStep(self, f):
 
-		## Update velocity of defect (sqrt)
-		# self.velocity = self.sqrtVelocity()
 
-		## Update velocity of defect (yurke)
-		self.velocity = self.yurkeVelocity()
+		x0 = self.position[0]
+		y0 = self.position[1]
 
+		a, b = f(x0, y0)
+		k1x, k1y = dt*a, dt*b
+
+		a, b = f(x0 + k1x/2, y0 + k1x/2)
+		k2x, k2y = dt*a, dt*b
+
+		a, b = f(x0 + k2x/2, y0 + k2y/2)
+		k3x, k3y = dt*a, dt*b
+
+		a, b = f(x0 + k3x, y0 + k3y)
+		k4x, k4y = dt*a, dt*b 
+		
+		kx = (k1x + 2*k2x + 2*k3x + k4x)/6
+		ky = (k1y + 2*k2y + 2*k3y + k4y)/6
+		
+		k = np.array([kx, ky])
+
+		return k
 
 	### Brownian motion step
 	def brownianStep(self):
@@ -191,34 +210,12 @@ class Defect():
 		return np.array([dx, dy])
 
 
-	### Brownian motion step (adaptive)
-	def brownianStepAdaptive(self):
-
-		## Mean
-		mu = 0
-
-		## Diffusion coefficient
-		D = (k_B*T)/(6*np.pi*eta_3D*ra)
-
-		## Mean value for Brownian step
-		sigma = np.sqrt(4*D)
-
-		## Step in x-direction
-		dx = np.random.normal(mu, sigma)
-
-		## Step in y-direction
-		dy = np.random.normal(mu, sigma)
-
-		## Return step
-		return np.array([dx, dy])
-
-
 
 	### Update the position of this defect
 	def updatePosition(self):
 
 		## Add velocity multiplied by timestep
-		self.position = self.position + self.velocity*(dt) + self.brownianStep()
+		self.position = self.position + self.velocityStep(self.sqrtVelocity) + self.brownianStep()
 
 
 
@@ -260,7 +257,7 @@ def checkAnnihilation(d1, d2):
 		dispVector = d2.position - d1.position
 
 		## Compute distance between the two defects
-		dist = np.linalg.norm(dispVector)
+		dist = np.sum(dispVector**2)**0.5
 
 		## If this distance is smaller than the prespecified annihilation distance
 		if dist < annihilationDist:
@@ -278,12 +275,6 @@ def checkAnnihilation(d1, d2):
 
 #### Run update sequence
 def update():
-
-	### For every existing defect
-	for d in dList:
-
-		## Update their velocities
-		d.updateVelocity()
 
 	### For every existing defect
 	for d in dList:
@@ -347,6 +338,10 @@ def saveBoard(runNum, fNum):
 	plt.xlim((-6e-4, 6e-4))
 	plt.ylim((-435e-6, 435e-6))
 
+	### Change x and y ticks
+	plt.xticks([-6e-4, -4e-4, -2e-4, 0, 2e-4, 4e-4, 6e-4])
+	plt.yticks([4e-4, -2e-4, 0, 2e-4, 4e-4])
+
 	### Add labels to axes
 	plt.xlabel("x-position (m)")
 	plt.xlabel("y-position (m)")
@@ -389,6 +384,9 @@ def saveBoard(runNum, fNum):
 
 			# Plot blue defect
 			ax.scatter(xPos, yPos, color="blue", s=2)
+
+	### Make x and y axis ticks equally spaced
+	plt.gca().set_aspect('equal', adjustable='box')
 
 	### Keep track of number of defects in the title
 	plt.title("Number of defects: " + str(len(dList)))
@@ -488,10 +486,10 @@ if __name__ == '__main__':
 	# print(sigma)
 
 	### Manually place defects
-	placeDefects()
+	# placeDefects()
 
 	### Or alternatively, perform a quench
-	# quench()
+	quench()
 
 	### Run the simulation of placed defects
 	runSimulation(runNum)
