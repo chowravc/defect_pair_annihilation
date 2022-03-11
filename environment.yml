@@ -1,0 +1,4 @@
+name: simEnv
+channels:
+  - defaults
+prefix: C:\Users\Sugar\anaconda3\envs\simEnv\envs\simEnv
