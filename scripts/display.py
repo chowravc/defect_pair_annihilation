@@ -1,6 +1,8 @@
 #### Importing useful packages
 import matplotlib.pyplot as plt
 import matplotlib.ticker
+import glob
+import cv2
 
 
 
@@ -107,3 +109,71 @@ def saveBoard(runNum, fNum, dList, expData):
 
 	### Close matplotlib plots
 	plt.close()
+
+
+## Convert frames to video
+def framesToVideo():
+
+	runNum = len(glob.glob('runs/exp*/'))
+
+	framesDir = 'runs/exp' + str(runNum) + '/frames/'
+
+	framerate = 25
+
+	print('\nLoading frames: ' + framesDir)
+
+	# Frames paths
+	fPath = glob.glob(framesDir + '*')
+
+	# If no frames found
+	if len(fPath) == 0:
+
+		print('\nNo Frames were found.')
+
+	# If frames are found
+	else:
+
+		print('Found ' + str(len(fPath)) + ' frames.')
+
+		# Output video name
+		vPath = 'runs/exp' + str(runNum) + '/' + framesDir.split('/')[-3] + '.avi'
+
+		# Reading first file for size
+		im0 = cv2.imread(fPath[0])
+
+		# Extracting video size
+		height, width, layers = im0.shape
+		size = (width, height)
+
+		# Output video
+		out = cv2.VideoWriter(vPath, cv2.VideoWriter_fourcc(*'DIVX'), framerate, size)
+
+		# Starting video write
+		for i, filename in enumerate(fPath):
+
+			# Displaying progress
+			if i%100 == 0:
+
+				print(str(100*i/len(fPath))[0:4]+'%')
+
+			# Reading current frame
+			img = cv2.imread(filename)
+
+			# Extracting shape
+			h, w, l = img.shape
+
+			# Checking if shape matches spec for video
+			if h == height  and w == width and l == layers:
+
+				# Write frame
+				out.write(img)
+
+			# If shape is different
+			else:
+
+				print('Incorrect shape for frame: ' + filename)
+				break
+
+		out.release()
+
+	print('\nDone.')
