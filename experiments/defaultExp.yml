@@ -1,7 +1,7 @@
 # Yaml file with experiment details
 
-### Type of the experiment
-expType: "place"
+### Type of the experiment ['place', 'quench']
+expType: "quench"
 
 ### Choose whether or not to show the board each save iteration
 showBoard: False
@@ -19,7 +19,7 @@ t0: 0
 tn: 2.0e-2
 
 ### Number of iterations
-n: 100000
+n: 10000
 
 ### Save image every __ iterations
 saveRate: 25

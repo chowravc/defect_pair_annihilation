@@ -4,6 +4,7 @@ import glob
 import matplotlib.pyplot as plt
 import random
 import os
+import csv
 
 #### Importing useful python scripts
 from scripts.display import *
@@ -160,11 +161,45 @@ def prepareExperiment():
 
 
 
+#### Save the number of defects with time
+def saveDefectNumber(i, dt, dList):
+
+	### Find current time since start
+	time = i*dt
+
+	### Number of defects in film
+	dNum = len(dList)
+
+	### Obtain current run number by looking at existing runs
+	runNum = len(glob.glob('runs/exp*/'))
+
+	### Save to txt file
+	with open('runs/exp' + str(runNum) + '/data/number.csv', 'a', newline='') as numberFile:
+
+		## Create writer object
+		writeNumberFile = csv.writer(numberFile)
+
+		## If this is the first line
+		if i == 0:
+
+			# Append the headers to the csv file
+			writeNumberFile.writerow(["time", "number"])
+			writeNumberFile.writerow(["s", ""])
+
+		## Append the data to the csv file
+		writeNumberFile.writerow([time, dNum])
+
+
+
+
 #### Function to run simulation
 def runSimulation(runNum, dList, expData):
 
 	### Number of iterations
 	n = expData['n']
+
+	### Timestep size
+	dt = (expData['tn'] - expData['t0']) / n
 
 	### Experiment saverate
 	saveRate = expData['saveRate']
@@ -177,6 +212,9 @@ def runSimulation(runNum, dList, expData):
 
 			# Display progress
 			print(str(100*i/n)[:5] + '%')
+
+		## Save time and number of defects
+		saveDefectNumber(i, dt, dList)
 
 		## Every savePer
 		if i%saveRate == 0:
