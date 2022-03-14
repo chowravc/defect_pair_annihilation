@@ -1,0 +1,53 @@
+# Yaml file with experiment details
+
+### Type of the experiment
+expType: "place"
+
+### Choose whether or not to show the board each save iteration
+showBoard: False
+
+### Type of velocity to use ['sqrt', 'yurke']
+velocityType: 'sqrt'
+
+### "Film" dimensions (Will be useful once I include boundary conditions)
+# (1200, 870) um
+
+### Start time
+t0: 0
+
+### End time
+tn: 2.0e-2
+
+### Number of iterations
+n: 100000
+
+### Save image every __ iterations
+saveRate: 25
+
+### Thickness of film
+h: 7.5e-9 # (m)
+
+### Frank Elastic Constant 3D
+K_3D: 0.73e-11 # (N)
+
+### Film viscosity 3D
+eta_3D: 2.0e-6 # (N*s/m^2)
+
+### Boltzmann constant
+k_B: 1.38e-27
+
+### Defect core size
+ra: 1.0e-6
+
+### Temperature
+T: 300 # (K)
+
+### Max dist for annihilation
+annihilationDist: 2.0e-6
+
+# Typical
+# 3D K = (2 - 5) *10^-7 erg/cm
+
+# Both K and eta can be the 3D version
+# K_2D = K_3D * h 
+# eta_2D = eta_3D * h
