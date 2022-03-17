@@ -1,5 +1,6 @@
 #### Importing useful packages
 import numpy as np
+import random
 
 
 #### Object for defect
@@ -135,31 +136,44 @@ class Defect():
 	### Brownian motion step
 	def brownianStep(self, expData):
 
+		## Boltzmann constant
 		k_B = expData['k_B']
 
+		## Temperature of the film
 		T = expData['T']
 
+		## Film viscosity in 3D
 		eta_3D = expData['eta_3D']
 
+		## Radius of defect core
 		ra = expData['ra']
 
+		## Timestep size
+		dt = (expData['tn'] - expData['t0']) / expData['n']
+
 		## Diffusion coefficient
-		D = (k_B*T)/(6*np.pi*eta_3D*ra)
+		D = (k_B * T) / (2 * np.pi * eta_3D * (2* ra))
 
-		## Mean value for Brownian step
-		sigma = np.sqrt(4*D)
+		## Mean value for dr**2
+		mu = 4*D
 
-		## Mean
-		mu = 0
+		## Standard deviation of Brownian step
+		sigma = 0
+
+		## Step squared in x-direction
+		drSq = np.random.normal(mu, sigma) * dt
 
 		## Step in x-direction
-		dx = np.random.normal(mu, sigma)
+		dr = np.sqrt(drSq)
 
-		## Step in y-direction
-		dy = np.random.normal(mu, sigma)
+		## Angle to move in
+		phi = random.uniform(0, 1) * (2 * np.pi)
+
+		## Step in dx, dy
+		step = dr * np.array([np.cos(phi), np.sin(phi)])
 
 		## Return step
-		return np.array([dx, dy])
+		return step
 
 
 

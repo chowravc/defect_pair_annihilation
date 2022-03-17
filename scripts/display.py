@@ -33,14 +33,18 @@ def saveBoard(runNum, fNum, dList, expData):
 	### Generate subplots
 	fig, ax = plt.subplots()
 
-	# format order of magnitude of `ax.yaxis`
+	### format order of magnitude of `ax.yaxis`
 	order = -6
 	ax.xaxis.set_major_formatter(OOMFormatter(order, '%1.1f'))
 	ax.yaxis.set_major_formatter(OOMFormatter(order, '%1.1f'))
 
+	### Get limits on the 'window'
+	xLimValue = (expData['windowDims'][0]/2) * 1e-6
+	yLimValue = (expData['windowDims'][1]/2) * 1e-6
+
 	### Set limits to plot
-	plt.xlim((-6e-4, 6e-4))
-	plt.ylim((-435e-6, 435e-6))
+	plt.xlim((-xLimValue, xLimValue))
+	plt.ylim((-yLimValue, yLimValue))
 
 	### Change x and y ticks
 	plt.xticks([-6e-4, -4e-4, -2e-4, 0, 2e-4, 4e-4, 6e-4])
@@ -111,44 +115,47 @@ def saveBoard(runNum, fNum, dList, expData):
 	plt.close()
 
 
-## Convert frames to video
+#### Convert frames to video
 def framesToVideo():
 
+	### Access the number of the current run
 	runNum = len(glob.glob('runs/exp*/'))
 
+	### Path to directory containing frames
 	framesDir = 'runs/exp' + str(runNum) + '/frames/'
 
+	### Framerate of output video
 	framerate = 25
 
 	print('\nLoading frames: ' + framesDir)
 
-	# Frames paths
+	### Frames paths
 	fPath = glob.glob(framesDir + '*')
 
-	# If no frames found
+	### If no frames found
 	if len(fPath) == 0:
 
 		print('\nNo Frames were found.')
 
-	# If frames are found
+	### If frames are found
 	else:
 
 		print('Found ' + str(len(fPath)) + ' frames.')
 
-		# Output video name
+		## Output video name
 		vPath = 'runs/exp' + str(runNum) + '/' + framesDir.split('/')[-3] + '.avi'
 
-		# Reading first file for size
+		## Reading first file for size
 		im0 = cv2.imread(fPath[0])
 
-		# Extracting video size
+		## Extracting video size
 		height, width, layers = im0.shape
 		size = (width, height)
 
-		# Output video
+		## Output video
 		out = cv2.VideoWriter(vPath, cv2.VideoWriter_fourcc(*'DIVX'), framerate, size)
 
-		# Starting video write
+		## Starting video write
 		for i, filename in enumerate(fPath):
 
 			# Displaying progress
@@ -174,6 +181,7 @@ def framesToVideo():
 				print('Incorrect shape for frame: ' + filename)
 				break
 
+		## Release the video
 		out.release()
 
 	print('\nDone.')

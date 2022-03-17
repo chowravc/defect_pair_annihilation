@@ -95,6 +95,7 @@ def update(dList, expData):
 #### Function to 'place' defects
 def placeDefects(expData):
 
+	### Create list to store existing defects
 	dList = []
 
 	# dList.append(PlusDefect("defect1", np.array([2e-4, 0.0]), np.pi))
@@ -110,6 +111,7 @@ def placeDefects(expData):
 
 	dList.append(MinusDefect("defect4", np.array([0.0, -2e-4]), np.pi))
 
+	### Return list of placed defects
 	return dList
 
 
@@ -117,24 +119,34 @@ def placeDefects(expData):
 #### Function to perform a film quench
 def quench(expData):
 
+	### Create list to store existing defects
 	dList = []
 
-	numQuench = 200
+	### Number of defects to place at the quench
+	numQuench = expData['quenchCount']
 
-	# Place roughly half positive defects
+	### Dimensions of film
+	filmDims = expData['filmDims']
+
+	### Place roughly half positive defects
 	for i in range(numQuench//2):
 
-		pos = np.array([6e-4*(random.uniform(0, 1)-0.5), 435e-6*(random.uniform(0, 1)-0.5)])
+		## Choose a random (x, y) starting position
+		pos = np.array([(1e-6*filmDims[0]/2)*(random.uniform(0, 1)-0.5), (1e-6*filmDims[1]/2)**(random.uniform(0, 1)-0.5)])
 
+		## 'Place' positive defect at that position
 		dList.append(PlusDefect("defect" + str(i+1), pos, np.pi))
 
-	# Place roughly half positive defects
+	### Place roughly half positive defects
 	for i in range(numQuench - numQuench//2):
 
-		pos = np.array([6e-4*(random.uniform(0, 1)-0.5), 435e-6*(random.uniform(0, 1)-0.5)])
+		## Choose a random (x, y) starting position
+		pos = np.array([(1e-6*filmDims[0]/2)**(random.uniform(0, 1)-0.5), (1e-6*filmDims[1]/2)*e-6*(random.uniform(0, 1)-0.5)])
 
+		## 'Place' negative defect at that position
 		dList.append(MinusDefect("defect" + str(numQuench//2 + i+1), pos, np.pi))
 
+	### Return list of placed defects
 	return dList
 
 

@@ -1,7 +1,10 @@
 # Yaml file with experiment details
 
 ### Type of the experiment ['place', 'quench']
-expType: "quench"
+expType: 'place'
+
+### Number of defects to create at quench
+quenchCount: 500
 
 ### Choose whether or not to show the board each save iteration
 showBoard: False
@@ -10,7 +13,10 @@ showBoard: False
 velocityType: 'sqrt'
 
 ### "Film" dimensions (Will be useful once I include boundary conditions)
-# (1200, 870) um
+filmDims: [1200, 870] # um
+
+### "Window" dimensions (Region being looked at)
+windowDims: [1200, 870] # um
 
 ### Start time
 t0: 0
@@ -34,7 +40,7 @@ K_3D: 0.73e-11 # (N)
 eta_3D: 2.0e-6 # (N*s/m^2)
 
 ### Boltzmann constant
-k_B: 1.38e-27
+k_B: 1.38e-23
 
 ### Defect core size
 ra: 1.0e-6
