@@ -15,13 +15,12 @@ from scripts.defect import *
 from scripts.simulation import *
 
 
-### Set numpy random seed
+#### Set numpy random seed
 np.random.seed(100)
 
 
-
-#### If the file is run directly
-if __name__ == '__main__':
+#### Main functioning of scipt
+def main():
 
 	### Open the specified experiment yaml
 	with open("experiments/defaultExp.yml", 'r') as stream:
@@ -58,3 +57,14 @@ if __name__ == '__main__':
 
 	### Save the experiment video
 	framesToVideo()
+
+	### Create number of defects as a function of time
+	numberPlotAuto()
+
+
+
+#### If the file is run directly
+if __name__ == '__main__':
+
+	### Run main function
+	main()

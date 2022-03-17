@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker
 import glob
 import cv2
+import pandas as pd
 
 
 
@@ -185,3 +186,67 @@ def framesToVideo():
 		out.release()
 
 	print('\nDone.')
+
+
+
+#### Creates a plot of number of defects as a function of time automatically
+def numberPlotAuto(runNum=99999):
+
+	### Check if default runNum was used
+	if runNum == 99999:
+
+		## Access the number of the current run
+		runNum = len(glob.glob('runs/exp*/'))
+
+	### Path to csv with number of defects as a function of time
+	csvPath = 'runs/exp' + str(runNum) + '/data/number.csv'
+
+	### Path to figure save location
+	figPath = 'runs/exp' + str(runNum) + '/data/numberVsTime.png'
+
+	### Load the csv as a pandas
+	numberDataframe = pd.read_csv(csvPath, index_col=None)
+
+	### Get the times
+	times = pd.Series.to_numpy(numberDataframe['time'][1:]).astype(float)
+
+	### Get the number
+	number = pd.Series.to_numpy(numberDataframe['number'][1:]).astype(float)
+
+	### Clear plots
+	plt.clf()
+
+	### Generate subplots
+	fig = plt.figure(linewidth=1.5)
+	ax = plt.gca()
+
+	### Plot the number as function of time
+	ax.scatter(times, number, c='blue', s=2, label='data')
+
+	### Set axis scales to loglog
+	ax.set_yscale('log')
+	ax.set_xscale('log')
+
+	### Move ticks inside
+	ax.tick_params(direction='in', which='both', bottom=True, top=True, left=True, right=True)
+	ax.tick_params(which='major', width=1.5, length=6)
+	ax.tick_params(which='minor', width=1.2, length=3)
+
+	### Add axis labels
+	plt.xlabel('time (s)', fontsize=12)
+	plt.ylabel('defect number', fontsize=12)
+
+	### Add legend
+	ax.legend()
+
+	### Save figure
+	plt.savefig(figPath, dpi=300)
+
+	### Show plots
+	# plt.show()
+
+	### Clear plots
+	plt.clf()
+
+	### Close plots
+	plt.close()
