@@ -1,7 +1,7 @@
 # Yaml file with experiment details
 
 ### Type of the experiment ['place', 'quench']
-expType: 'place'
+expType: 'quench'
 
 ### Number of defects to create at quench
 quenchCount: 500

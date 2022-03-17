@@ -132,7 +132,7 @@ def quench(expData):
 	for i in range(numQuench//2):
 
 		## Choose a random (x, y) starting position
-		pos = np.array([(1e-6*filmDims[0]/2)*(random.uniform(0, 1)-0.5), (1e-6*filmDims[1]/2)**(random.uniform(0, 1)-0.5)])
+		pos = np.array([(1e-6*filmDims[0])*(random.uniform(0, 1)-0.5), (1e-6*filmDims[1])*(random.uniform(0, 1)-0.5)])
 
 		## 'Place' positive defect at that position
 		dList.append(PlusDefect("defect" + str(i+1), pos, np.pi))
@@ -141,7 +141,7 @@ def quench(expData):
 	for i in range(numQuench - numQuench//2):
 
 		## Choose a random (x, y) starting position
-		pos = np.array([(1e-6*filmDims[0]/2)**(random.uniform(0, 1)-0.5), (1e-6*filmDims[1]/2)*e-6*(random.uniform(0, 1)-0.5)])
+		pos = np.array([(1e-6*filmDims[0])*(random.uniform(0, 1)-0.5), (1e-6*filmDims[1])*(random.uniform(0, 1)-0.5)])
 
 		## 'Place' negative defect at that position
 		dList.append(MinusDefect("defect" + str(numQuench//2 + i+1), pos, np.pi))
